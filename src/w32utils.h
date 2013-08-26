@@ -8,6 +8,7 @@ void to_longpath(char *path, int len);
 
 # ifdef WIN32
 void sleep(int sec);
-# endif
+char* get_sort_path(char *sortprogram, int len);
+#endif
 
 #endif /* CSCOPE_W32UTILS_H */

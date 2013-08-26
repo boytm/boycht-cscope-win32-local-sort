@@ -10,6 +10,9 @@
 
 #include <windows.h>
 
+#include <io.h>
+#include <stdio.h>
+
 #include "alloc.h"
 
 static char *get_longpath_internal(char *path, int len);
@@ -58,6 +61,34 @@ static char *get_longpath_internal(char *path, int len)
 void sleep(int sec)
 {
     Sleep(sec * 1000);
+}
+
+#define SORT_EXECUTABLE "sort.exe"
+
+char* get_sort_path(char *sortprogram, int len)
+{
+    if(sortprogram == NULL || 0 == len)
+        return NULL;
+
+    GetModuleFileName(NULL, sortprogram, len);
+
+    fprintf(stdout, "%s\n", sortprogram);
+
+    char *pos = strrchr(sortprogram, '\\');
+    if(pos == NULL)
+        pos = sortprogram;
+    else
+        ++pos;
+
+    strcpy(pos, SORT_EXECUTABLE);
+
+    if(access(sortprogram, X_OK) == 0)
+    {
+        fprintf(stdout, "%s\n", sortprogram);
+        return sortprogram;
+    }
+    else
+        return strncpy(sortprogram, SORT_EXECUTABLE, len);
 }
 
 #else

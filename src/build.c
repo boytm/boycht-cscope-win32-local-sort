@@ -457,7 +457,7 @@ cscope: converting to new symbol database file format\n");
 
     /* create the inverted index if requested */
     if (invertedindex == YES) {
-	char	sortcommand[PATHLEN + 1];
+	char	sortcommand[PATHLEN * 3 + 100];
 
 	if (fflush(postings) == EOF) {
 	    cannotwrite(temp1);
@@ -466,12 +466,15 @@ cscope: converting to new symbol database file format\n");
 	fstat(fileno(postings), &statstruct);
 	fclose(postings);
 #ifdef WIN32
-	snprintf(sortcommand, sizeof(sortcommand), "set LC_ALL=C && sort -T %s %s", tmpdir, temp1);
+    char sortprogram[PATHLEN + 1] = {0};
+
+	snprintf(sortcommand, sizeof(sortcommand), "set LC_ALL=C && \"%s\" -T \"%s\" \"%s\" ", get_sort_path(sortprogram, PATHLEN), tmpdir, temp1);
 #else	
 	snprintf(sortcommand, sizeof(sortcommand), "env LC_ALL=C sort -T %s %s", tmpdir, temp1);
 #endif
 	if ((postings = mypopen(sortcommand, "r")) == NULL) {
 	    fprintf(stderr, "cscope: cannot open pipe to sort command\n");
+	    fprintf(stderr, "%s\n", sortprogram);
 	    cannotindex();
 	} else {
 	    if ((totalterms = invmake(newinvname, newinvpost, postings)) > 0) {
